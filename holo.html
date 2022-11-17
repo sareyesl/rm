@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - effects - peppers ghost</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+	</head>
+	<body>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r119/three.min.js" ></script>
+		<script src="inflate.min.js"></script>
+		<script src="FBXLoader.js"></script>
+		<script src="OrbitControls.js"></script>
+		<script src="PeppersGhostEffect.js"></script>
+
+		<script>
+			var scene = new THREE.Scene();
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
+				var mixer;
+				var group;
+			init();
+			animate();
+
+			function init() {
+				/*const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+				const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+				const cube = new THREE.Mesh( geometry, material );
+				scene.add( cube );*/
+				group = new THREE.Group();
+				const light = new THREE.AmbientLight( 0xffffff ); // soft white light
+            	scene.add( light );
+				const carritoMaterial = new THREE.MeshStandardMaterial( {
+                color: 0xaaaaaa,metallic:1.0} );
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				document.body.appendChild( renderer.domElement );
+
+				effect = new THREE.PeppersGhostEffect( renderer );
+				effect.setSize( window.innerWidth, window.innerHeight );
+				effect.cameraDistance = 5;
+				const loader = new THREE.FBXLoader();
+
+				loader.load( 'Raccon.fbx', function ( object ) {
+			
+			mixer = new THREE.AnimationMixer( object );
+
+			//const action = mixer.clipAction( object.animations[ 0 ] );
+			//action.play();
+
+			object.traverse( function ( child ) {
+
+				if ( child.isMesh ) {
+					
+				}
+
+			} );
+			object.scale.x=1;
+			object.scale.y=1;
+			object.scale.z=1;
+			group.add( object );
+			} 
+			);
+			
+				window.addEventListener( 'resize', onWindowResize );
+				scene.add(group);
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				effect.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+				group.rotation.y += 0.01;
+				const delta =0.05;
+				requestAnimationFrame( animate );
+				effect.render( scene, camera );
+				if ( mixer ) mixer.update( delta );
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
